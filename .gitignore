@@ -1,0 +1,6 @@
+
+target/compiled
+target/run
+dbt_modules/
+logs/
+

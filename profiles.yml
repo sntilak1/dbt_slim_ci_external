@@ -1,0 +1,23 @@
+jaffle_shop:
+  target: prod
+  outputs:
+    prod:
+      account: ****
+      database: ****
+      password: "{{ env_var('etl_user_pw') }}"
+      role: ****
+      schema: ****
+      threads: 1
+      type: snowflake
+      user: ****
+      warehouse: ****
+    ci:
+      account: ****
+      database: ****
+      password: "{{ env_var('etl_user_pw') }}"
+      role: ****
+      schema: ****
+      threads: 1
+      type: snowflake
+      user: ****
+      warehouse: ****

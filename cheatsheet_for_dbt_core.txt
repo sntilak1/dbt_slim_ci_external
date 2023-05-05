@@ -1,0 +1,4 @@
+use of codegen to get fields from a table for generation of the staging table
+Run the following command after installing the codegen package.
+
+dbt run-operation generate_base_model --args '{"source_name": "prod", "table_name": "bv_mt_pega_cs_case"}'

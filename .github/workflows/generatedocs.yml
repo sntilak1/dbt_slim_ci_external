@@ -1,0 +1,62 @@
+name: creating_dbt_docs
+
+on:
+    workflow_dispatch:
+    #schedule:
+    #  - cron: "0 * * * * "
+    #  - cron: "1 * * * * "
+    # https://crontab.guru/
+    #
+    #
+    #
+
+
+jobs:
+    run-shell-command:
+        runs-on: [self-hosted,cloud] #ubuntu-latest
+        steps:
+          # https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
+          - name: checkout
+            uses: actions/checkout@master
+          - name: echo a string
+            run: echo "hello world"
+          - name: multi-line
+            env:
+                etl_role: ${{secrets.ETL_ROLE}}
+                #https://docs.github.com/en/actions/security-guides/encrypted-secrets                
+            run: |
+                git config --global user.email "sntilak1@gmail.com"
+                git config --global user.name "Sandeep"
+                echo "github_sha and github_run_id"
+                echo "$GITHUB_SHA$GITHUB_RUN_ID"
+                docker build -f Dockerfile_dbt_docs -t "$GITHUB_SHA$GITHUB_RUN_ID:latest" .
+                docker run --name "$GITHUB_SHA$GITHUB_RUN_ID" -e etl_user_pw="${{secrets.ETL_ROLE}}" "$GITHUB_SHA$GITHUB_RUN_ID:latest"
+
+                mkdir -p docs
+                docker container ls -a
+                docker cp "$GITHUB_SHA$GITHUB_RUN_ID":/code/target/index.html ./docs/index.html
+                docker cp "$GITHUB_SHA$GITHUB_RUN_ID":/code/target/manifest.json ./docs/manifest.json
+                docker cp "$GITHUB_SHA$GITHUB_RUN_ID":/code/target/catalog.json ./docs/catalog.json
+                git add --all
+                git commit -m"Creating Documentation thru GitHub Actions" -a
+                git push https://"{{github.token}}"@github.com/"$GITHUB_REPOSITORY.git"
+                docker rm "$GITHUB_SHA$GITHUB_RUN_ID"
+                docker image rm "$GITHUB_SHA$GITHUB_RUN_ID"
+                #pwd
+                #cd ${{ github.workspace }}
+                #pwd
+                #ls -la
+                #docker build -t dbt/git:latest .
+                #docker run --rm -e etl_user_pw="${{secrets.ETL_ROLE}}" dbt/git
+                #cd ${{ github.workspace }}
+                #ls -la
+                #echo $GITHUB_SHA
+                #echo $GITHUB_REPOSITORY
+                #echo $GITHUB_WORKSPACE
+                #echo $GITHUB_ACTOR
+                #echo $GITHUB_USERNAME
+                #git config --global user.email "sntilak1@gmail.com"
+                #git config --global user.name "Sandeep"
+                #echo "{{github.token}}"
+                #echo "{{github.repository}}"
+                #cp ./target/index.html ./docs/index.html
